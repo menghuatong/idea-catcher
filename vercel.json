@@ -1,0 +1,8 @@
+# Vercel 部署配置
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["hkg1"]
+}
