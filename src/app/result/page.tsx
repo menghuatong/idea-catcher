@@ -5,14 +5,14 @@ import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
   RefreshCw, 
-  Pencil, 
   Image as ImageIcon, 
   Download,
-  Save,
   Loader2,
   Check,
-  Edit3
+  Edit3,
+  ArrowRight
 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,8 +21,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/store/useAppStore';
-import { CARD_SPECS, GeneratedContent, ImageStyle } from '@/types';
+import { CARD_SPECS, ImageStyle } from '@/types';
 
 const IMAGE_STYLES: { id: ImageStyle; name: string; icon: string }[] = [
   { id: 'minimal', name: '简约', icon: '⚪' },
@@ -149,13 +150,11 @@ export default function ResultPage() {
 
   if (!mounted) return null;
 
-  const currentSpec = CARD_SPECS.find(s => s.id === cardSpec) || CARD_SPECS[0];
-
   return (
-    <main className="min-h-screen bg-background relative overflow-hidden">
+    <main className="min-h-screen bg-background">
       {/* 背景 */}
       <div className="fixed inset-0 grid-bg" />
-      <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px]" />
+      <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px]" />
       <div className="fixed bottom-1/4 right-1/4 w-[300px] h-[300px] bg-purple-500/10 rounded-full blur-[80px]" />
 
       {/* 顶部导航 */}
@@ -189,8 +188,8 @@ export default function ResultPage() {
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Progress value={100} className="w-24 hidden sm:flex" />
+        <div className="flex items-center gap-3">
+          <Progress value={100} className="w-24 hidden sm:block" />
           <Badge variant="secondary">完成</Badge>
         </div>
       </header>
@@ -201,14 +200,14 @@ export default function ResultPage() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-sm">🎴</span>
+                <span className="text-sm text-primary-foreground">🎴</span>
               </div>
               <h2 className="text-lg font-semibold text-foreground">卡片预览</h2>
             </div>
             
             <Card className="overflow-hidden shadow-xl">
               {/* 配图 */}
-              <div className="relative aspect-[3/4] bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
+              <div className="relative aspect-[3/4] bg-gradient-to-br from-primary/20 to-purple-500/20">
                 {imageUrl ? (
                   <img src={imageUrl} alt="配图" className="w-full h-full object-cover" />
                 ) : isGeneratingImage ? (
@@ -358,7 +357,7 @@ export default function ResultPage() {
             {/* 导出按钮 */}
             <div className="space-y-3">
               <Button 
-                className="w-full bg-primary hover:bg-primary/90"
+                className="w-full"
                 onClick={() => handleExport('png')}
               >
                 <Download className="h-4 w-4 mr-2" />

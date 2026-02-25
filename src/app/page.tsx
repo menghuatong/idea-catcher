@@ -6,17 +6,19 @@ import {
   Lightbulb, 
   FileText, 
   Sparkles, 
-  Image, 
+  Image as ImageIcon, 
   Search, 
   ArrowRight,
   History,
   Settings,
   Zap
 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/store/useAppStore';
 import { HOT_TOPICS, EntryType } from '@/types';
 
@@ -26,36 +28,36 @@ const ENTRY_OPTIONS = [
     icon: Lightbulb, 
     title: '输入主题', 
     desc: '输入关键词，AI搜索数据生成概念',
-    color: 'text-indigo-500',
-    bgColor: 'bg-indigo-500/10',
-    gradient: 'hover:bg-indigo-500/20',
+    iconColor: 'text-primary',
+    cardBg: 'bg-primary/10',
+    hoverBg: 'hover:bg-primary/20',
   },
   { 
     type: 'file' as EntryType, 
     icon: FileText, 
     title: '上传资料', 
     desc: '上传PDF/Word，提取要点生成概念',
-    color: 'text-cyan-500',
-    bgColor: 'bg-cyan-500/10',
-    gradient: 'hover:bg-cyan-500/20',
+    iconColor: 'text-cyan-500',
+    cardBg: 'bg-cyan-500/10',
+    hoverBg: 'hover:bg-cyan-500/20',
   },
   { 
     type: 'text' as EntryType, 
     icon: Sparkles, 
     title: '粘贴文字', 
     desc: '粘贴已有内容，AI优化并配图',
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-500/10',
-    gradient: 'hover:bg-orange-500/20',
+    iconColor: 'text-orange-500',
+    cardBg: 'bg-orange-500/10',
+    hoverBg: 'hover:bg-orange-500/20',
   },
   { 
     type: 'image' as EntryType, 
-    icon: Image, 
+    icon: ImageIcon, 
     title: '上传图片', 
     desc: '上传图片，AI分析生成匹配文案',
-    color: 'text-emerald-500',
-    bgColor: 'bg-emerald-500/10',
-    gradient: 'hover:bg-emerald-500/20',
+    iconColor: 'text-emerald-500',
+    cardBg: 'bg-emerald-500/10',
+    hoverBg: 'hover:bg-emerald-500/20',
   },
 ];
 
@@ -71,9 +73,7 @@ export default function HomePage() {
 
   const handleEntrySelect = (type: EntryType) => {
     setEntryType(type);
-    if (type === 'topic') {
-      // 保持在首页，显示搜索框
-    } else {
+    if (type !== 'topic') {
       router.push(`/upload?type=${type}`);
     }
   };
@@ -92,19 +92,16 @@ export default function HomePage() {
   if (!mounted) return null;
 
   return (
-    <main className="min-h-screen relative overflow-hidden bg-background">
-      {/* 背景效果 */}
+    <main className="min-h-screen bg-background">
+      {/* 背景 */}
       <div className="fixed inset-0 grid-bg" />
-      
-      {/* 渐变光晕 */}
-      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-indigo-500/20 rounded-full blur-[120px] animate-pulse-glow" />
+      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] animate-pulse-glow" />
       <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[100px] animate-pulse-glow" style={{ animationDelay: '1s' }} />
-      <div className="fixed top-1/2 right-0 w-[400px] h-[400px] bg-pink-500/10 rounded-full blur-[80px]" />
 
       {/* 导航栏 */}
-      <header className="relative z-50 flex items-center justify-between px-6 py-4 lg:px-12">
+      <header className="relative z-50 flex items-center justify-between px-6 py-4 lg:px-12 border-b border-border/50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl shadow-lg shadow-indigo-500/30">
+          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-xl text-primary-foreground shadow-lg shadow-primary/30">
             🎯
           </div>
           <div>
@@ -117,12 +114,12 @@ export default function HomePage() {
           <Button 
             variant="ghost" 
             onClick={() => router.push('/history')}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground"
           >
             <History className="h-4 w-4 mr-2" />
             历史记录
           </Button>
-          <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" className="text-muted-foreground">
             <Settings className="h-4 w-4 mr-2" />
             设置
           </Button>
@@ -149,7 +146,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* 入口卡片 */}
+        {/* 入口卡片 - 4列网格 */}
         <div className="w-full max-w-5xl mb-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {ENTRY_OPTIONS.map((option) => {
@@ -157,14 +154,14 @@ export default function HomePage() {
               return (
                 <Card 
                   key={option.type}
-                  className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${option.gradient} border-border hover:border-primary/50`}
+                  className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${option.hoverBg} bg-card border-border`}
                   onClick={() => handleEntrySelect(option.type)}
                 >
                   <CardContent className="p-6">
-                    <div className={`w-14 h-14 rounded-xl ${option.bgColor} flex items-center justify-center mb-4`}>
-                      <Icon className={`h-7 w-7 ${option.color}`} />
+                    <div className={`w-14 h-14 rounded-xl ${option.cardBg} flex items-center justify-center mb-4`}>
+                      <Icon className={`h-7 w-7 ${option.iconColor}`} />
                     </div>
-                    <CardTitle className="text-lg mb-2">{option.title}</CardTitle>
+                    <CardTitle className="text-lg mb-2 text-card-foreground">{option.title}</CardTitle>
                     <CardDescription className="text-sm">{option.desc}</CardDescription>
                   </CardContent>
                 </Card>
@@ -176,8 +173,8 @@ export default function HomePage() {
         {/* 搜索框 */}
         <div className="w-full max-w-2xl mb-8">
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
-            <div className="relative flex items-center bg-card rounded-xl overflow-hidden border border-border group-hover:border-primary/50 transition-colors">
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary via-purple-500 to-pink-500 rounded-xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
+            <div className="relative flex items-center bg-card rounded-xl border border-border overflow-hidden">
               <Search className="h-5 w-5 ml-5 text-muted-foreground" />
               <Input
                 type="text"
@@ -190,7 +187,7 @@ export default function HomePage() {
               <Button
                 onClick={handleSearch}
                 disabled={!topic.trim()}
-                className="m-2 px-6 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                className="m-2 bg-primary hover:bg-primary/90"
               >
                 开始生成
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -218,8 +215,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 分隔线 */}
+      <Separator className="relative z-10" />
+
       {/* 底部 */}
-      <footer className="relative z-10 text-center py-6 border-t border-border">
+      <footer className="relative z-10 text-center py-6">
         <p className="text-sm text-muted-foreground">
           概念大师 © 2026 · Made with ❤️ by AI
         </p>

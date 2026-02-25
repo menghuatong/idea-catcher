@@ -11,6 +11,7 @@ import {
   FileX,
   Calendar
 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -81,17 +82,16 @@ export default function HistoryPage() {
     if (searchQuery && !record.topic?.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-    // 时间筛选逻辑可以后续扩展
     return true;
   });
 
   if (!mounted) return null;
 
   return (
-    <main className="min-h-screen bg-background relative overflow-hidden">
+    <main className="min-h-screen bg-background">
       {/* 背景 */}
       <div className="fixed inset-0 grid-bg" />
-      <div className="fixed top-1/3 left-1/4 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px]" />
+      <div className="fixed top-1/3 left-1/4 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px]" />
 
       {/* 顶部导航 */}
       <header className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-border">
@@ -142,7 +142,7 @@ export default function HistoryPage() {
         {isLoading ? (
           <div className="space-y-4 pb-6">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="border-border">
+              <Card key={i}>
                 <CardContent className="p-4 flex gap-4">
                   <Skeleton className="w-24 h-24 rounded-lg" />
                   <div className="flex-1 space-y-3">
@@ -159,12 +159,12 @@ export default function HistoryPage() {
             {filteredRecords.map((record) => (
               <Card 
                 key={record.id}
-                className="border-border hover:border-primary/50 transition-colors overflow-hidden"
+                className="hover:border-primary/50 transition-colors overflow-hidden"
               >
                 <CardContent className="p-0">
                   <div className="flex">
                     {/* 缩略图 */}
-                    <div className="w-32 h-32 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex-shrink-0 relative overflow-hidden">
+                    <div className="w-32 h-32 bg-gradient-to-br from-primary/20 to-purple-500/20 flex-shrink-0 relative overflow-hidden">
                       {record.imageUrl ? (
                         <img src={record.imageUrl} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -176,18 +176,16 @@ export default function HistoryPage() {
 
                     {/* 内容 */}
                     <div className="flex-1 p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="font-semibold text-foreground text-lg mb-2">
-                            {record.topic || '未命名'}
-                          </h3>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Badge variant="secondary">
-                              {record.templateName}
-                            </Badge>
-                            <span>•</span>
-                            <span>{formatDate(record.createdAt)}</span>
-                          </div>
+                      <div className="mb-3">
+                        <h3 className="font-semibold text-card-foreground text-lg mb-2">
+                          {record.topic || '未命名'}
+                        </h3>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Badge variant="secondary">
+                            {record.templateName}
+                          </Badge>
+                          <span>•</span>
+                          <span>{formatDate(record.createdAt)}</span>
                         </div>
                       </div>
 
@@ -202,7 +200,6 @@ export default function HistoryPage() {
                         <Button
                           size="sm"
                           onClick={() => handleRestore(record)}
-                          className="bg-primary hover:bg-primary/90"
                         >
                           <RotateCcw className="h-4 w-4 mr-1" />
                           恢复
@@ -232,7 +229,6 @@ export default function HistoryPage() {
             <p className="text-muted-foreground mb-8">开始创建你的第一个概念卡片吧</p>
             <Button
               onClick={() => router.push('/')}
-              className="bg-primary hover:bg-primary/90"
             >
               <Plus className="h-4 w-4 mr-2" />
               开始创建

@@ -13,6 +13,7 @@ import {
   GitCompare,
   Sparkles
 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,38 +23,38 @@ import { Template } from '@/types';
 
 const TEMPLATE_CONFIG: Record<string, { 
   icon: React.ElementType; 
-  color: string; 
-  bgColor: string;
+  iconColor: string; 
+  cardBg: string;
   borderColor: string;
 }> = {
   'product-concept': { 
     icon: LayoutTemplate, 
-    color: 'text-indigo-500',
-    bgColor: 'bg-indigo-500/10',
-    borderColor: 'border-indigo-500/50',
+    iconColor: 'text-primary',
+    cardBg: 'bg-primary/10',
+    borderColor: 'border-primary/50',
   },
   'marketing-creative': { 
     icon: Megaphone, 
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-500/10',
+    iconColor: 'text-orange-500',
+    cardBg: 'bg-orange-500/10',
     borderColor: 'border-orange-500/50',
   },
   'brand-story': { 
     icon: BookOpen, 
-    color: 'text-pink-500',
-    bgColor: 'bg-pink-500/10',
+    iconColor: 'text-pink-500',
+    cardBg: 'bg-pink-500/10',
     borderColor: 'border-pink-500/50',
   },
   'feature-intro': { 
     icon: Settings, 
-    color: 'text-cyan-500',
-    bgColor: 'bg-cyan-500/10',
+    iconColor: 'text-cyan-500',
+    cardBg: 'bg-cyan-500/10',
     borderColor: 'border-cyan-500/50',
   },
   'comparison-review': { 
     icon: GitCompare, 
-    color: 'text-emerald-500',
-    bgColor: 'bg-emerald-500/10',
+    iconColor: 'text-emerald-500',
+    cardBg: 'bg-emerald-500/10',
     borderColor: 'border-emerald-500/50',
   },
 };
@@ -82,7 +83,7 @@ export default function TemplatePage() {
   if (!mounted) return null;
 
   return (
-    <main className="min-h-screen bg-background relative overflow-hidden">
+    <main className="min-h-screen bg-background">
       {/* 背景效果 */}
       <div className="fixed inset-0 grid-bg" />
       <div className="fixed top-1/3 right-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[100px]" />
@@ -118,8 +119,8 @@ export default function TemplatePage() {
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Progress value={50} className="w-24 hidden sm:flex" />
+        <div className="flex items-center gap-3">
+          <Progress value={50} className="w-24 hidden sm:block" />
           <span className="text-sm text-muted-foreground hidden sm:inline">步骤 2/4</span>
         </div>
       </header>
@@ -144,14 +145,14 @@ export default function TemplatePage() {
                 className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${
                   isSelected 
                     ? `${config.borderColor} border-2 bg-primary/5` 
-                    : 'border-border hover:border-primary/50'
+                    : 'hover:border-primary/50'
                 }`}
                 onClick={() => handleSelect(template)}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <div className={`w-14 h-14 rounded-xl ${config.bgColor} flex items-center justify-center`}>
-                      <Icon className={`h-7 w-7 ${config.color}`} />
+                    <div className={`w-14 h-14 rounded-xl ${config.cardBg} flex items-center justify-center`}>
+                      <Icon className={`h-7 w-7 ${config.iconColor}`} />
                     </div>
                     {isSelected && (
                       <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
@@ -159,10 +160,7 @@ export default function TemplatePage() {
                       </div>
                     )}
                   </div>
-                  <CardTitle className="flex items-center gap-2 mt-4">
-                    <span className="text-xl">{template.icon}</span>
-                    {template.name}
-                  </CardTitle>
+                  <CardTitle className="mt-4">{template.name}</CardTitle>
                   <CardDescription>{template.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -196,14 +194,14 @@ export default function TemplatePage() {
       </div>
 
       {/* 底部操作栏 */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg border-t border-border px-6 py-4">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-t border-border px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="text-muted-foreground">
             {selectedTemplate ? (
               <div className="flex items-center gap-2">
                 <span>已选择</span>
-                <Badge variant="secondary">
-                  {selectedTemplate.icon} {selectedTemplate.name}
+                <Badge>
+                  {selectedTemplate.name}
                 </Badge>
               </div>
             ) : (
@@ -220,7 +218,6 @@ export default function TemplatePage() {
             <Button
               onClick={handleNext}
               disabled={!selectedTemplate}
-              className="bg-primary hover:bg-primary/90"
             >
               生成概念
               <Sparkles className="h-4 w-4 ml-2" />

@@ -6,17 +6,19 @@ import {
   ArrowLeft, 
   Search, 
   ExternalLink, 
-  Check,
   ArrowRight,
   Loader2
 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/store/useAppStore';
 import { SearchResult } from '@/types';
 
@@ -78,10 +80,10 @@ export default function SearchPage() {
   if (!mounted) return null;
 
   return (
-    <main className="min-h-screen bg-background relative overflow-hidden">
+    <main className="min-h-screen bg-background">
       {/* 背景效果 */}
       <div className="fixed inset-0 grid-bg" />
-      <div className="fixed top-0 left-1/4 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px]" />
+      <div className="fixed top-0 left-1/4 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px]" />
 
       {/* 顶部导航 */}
       <header className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-border">
@@ -114,15 +116,15 @@ export default function SearchPage() {
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Progress value={25} className="w-24 hidden sm:flex" />
+        <div className="flex items-center gap-3">
+          <Progress value={25} className="w-24 hidden sm:block" />
           <span className="text-sm text-muted-foreground hidden sm:inline">步骤 1/4</span>
         </div>
       </header>
 
       {/* 搜索框 */}
       <div className="relative z-10 max-w-3xl mx-auto px-6 py-8">
-        <div className="flex items-center gap-3 bg-card rounded-xl p-2 border border-border">
+        <div className="flex items-center gap-3 bg-card rounded-lg p-2 border border-border">
           <Search className="h-5 w-5 ml-3 text-muted-foreground" />
           <Input
             type="text"
@@ -135,7 +137,6 @@ export default function SearchPage() {
           <Button
             onClick={handleResarch}
             disabled={isLoading || !searchKeyword.trim()}
-            className="bg-primary hover:bg-primary/90"
           >
             {isLoading ? (
               <>
@@ -152,9 +153,9 @@ export default function SearchPage() {
       {/* 搜索结果 */}
       <ScrollArea className="relative z-10 max-w-3xl mx-auto px-6 h-[calc(100vh-280px)]">
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-4 pb-4">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="border-border">
+              <Card key={i}>
                 <CardContent className="p-5">
                   <Skeleton className="h-5 w-3/4 mb-3" />
                   <Skeleton className="h-4 w-full mb-2" />
@@ -171,33 +172,28 @@ export default function SearchPage() {
                 className={`cursor-pointer transition-all duration-300 hover:shadow-md ${
                   result.selected
                     ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50'
+                    : 'hover:border-primary/50'
                 }`}
                 onClick={() => toggleResultSelection(result.id)}
               >
                 <CardContent className="p-5">
                   <div className="flex items-start gap-4">
-                    {/* 选择框 */}
-                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all border ${
-                      result.selected
-                        ? 'bg-primary border-primary'
-                        : 'bg-muted border-border'
-                    }`}>
-                      {result.selected && (
-                        <Check className="h-4 w-4 text-primary-foreground" />
-                      )}
-                    </div>
+                    {/* 使用 Shadcn Checkbox */}
+                    <Checkbox 
+                      checked={result.selected}
+                      onCheckedChange={() => toggleResultSelection(result.id)}
+                    />
                     
                     {/* 内容 */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-foreground mb-2">
+                      <h3 className="font-medium text-card-foreground mb-2">
                         {result.title}
                       </h3>
                       <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                         {result.snippet}
                       </p>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary">
                           {result.source}
                         </Badge>
                         {result.url && (
@@ -229,13 +225,11 @@ export default function SearchPage() {
       </ScrollArea>
 
       {/* 底部操作栏 */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-lg border-t border-border px-6 py-4">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-t border-border px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">已选择</span>
-            <Badge variant="secondary" className="font-medium">
-              {selectedCount} 条
-            </Badge>
+            <Badge>{selectedCount} 条</Badge>
           </div>
           <div className="flex gap-3">
             <Button
@@ -247,7 +241,6 @@ export default function SearchPage() {
             <Button
               onClick={handleNext}
               disabled={selectedCount === 0}
-              className="bg-primary hover:bg-primary/90"
             >
               下一步：选择模板
               <ArrowRight className="h-4 w-4 ml-2" />
