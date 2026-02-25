@@ -2,6 +2,28 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { 
+  ArrowLeft, 
+  Trash2, 
+  RotateCcw, 
+  Plus,
+  Search,
+  FileX,
+  Calendar
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { HistoryRecord } from '@/types';
 
 export default function HistoryPage() {
@@ -9,6 +31,8 @@ export default function HistoryPage() {
   const [records, setRecords] = useState<HistoryRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [timeFilter, setTimeFilter] = useState('all');
 
   useEffect(() => {
     setMounted(true);
@@ -53,123 +77,169 @@ export default function HistoryPage() {
     });
   };
 
+  const filteredRecords = records.filter(record => {
+    if (searchQuery && !record.topic?.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    // 时间筛选逻辑可以后续扩展
+    return true;
+  });
+
   if (!mounted) return null;
 
   return (
-    <main className="min-h-screen bg-[#0F0F23] relative overflow-hidden">
+    <main className="min-h-screen bg-background relative overflow-hidden">
       {/* 背景 */}
       <div className="fixed inset-0 grid-bg" />
       <div className="fixed top-1/3 left-1/4 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px]" />
 
       {/* 顶部导航 */}
-      <header className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-white/5">
+      <header className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-4">
-          <button 
-            onClick={() => router.push('/')} 
-            className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:bg-white/10 transition-all"
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => router.push('/')}
           >
-            ←
-          </button>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
           <div>
-            <h1 className="text-lg font-bold text-white">历史记录</h1>
-            <p className="text-xs text-gray-500">共 {records.length} 条记录</p>
+            <h1 className="text-lg font-bold text-foreground">历史记录</h1>
+            <p className="text-xs text-muted-foreground">共 {records.length} 条记录</p>
           </div>
         </div>
       </header>
 
+      {/* 筛选区 */}
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-6">
+        <div className="flex gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="搜索主题..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={timeFilter} onValueChange={setTimeFilter}>
+            <SelectTrigger className="w-40">
+              <Calendar className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="时间筛选" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部</SelectItem>
+              <SelectItem value="today">今天</SelectItem>
+              <SelectItem value="week">最近7天</SelectItem>
+              <SelectItem value="month">最近30天</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       {/* 列表 */}
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-8">
+      <ScrollArea className="relative z-10 max-w-4xl mx-auto px-6 h-[calc(100vh-220px)]">
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-4 pb-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-[#1A1A2E] rounded-xl p-4 border border-white/5 flex gap-4">
-                <div className="skeleton w-24 h-24 rounded-lg" />
-                <div className="flex-1">
-                  <div className="skeleton h-5 w-1/2 mb-3" />
-                  <div className="skeleton h-4 w-1/4 mb-2" />
-                  <div className="skeleton h-3 w-3/4" />
-                </div>
-              </div>
+              <Card key={i} className="border-border">
+                <CardContent className="p-4 flex gap-4">
+                  <Skeleton className="w-24 h-24 rounded-lg" />
+                  <div className="flex-1 space-y-3">
+                    <Skeleton className="h-5 w-1/2" />
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-3 w-3/4" />
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        ) : records.length > 0 ? (
-          <div className="space-y-4">
-            {records.map((record) => (
-              <div
+        ) : filteredRecords.length > 0 ? (
+          <div className="space-y-4 pb-6">
+            {filteredRecords.map((record) => (
+              <Card 
                 key={record.id}
-                className="group bg-[#1A1A2E] rounded-2xl border border-white/10 overflow-hidden hover:border-white/20 transition-all duration-300"
+                className="border-border hover:border-primary/50 transition-colors overflow-hidden"
               >
-                <div className="flex">
-                  {/* 缩略图 */}
-                  <div className="w-32 h-32 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex-shrink-0 relative overflow-hidden">
-                    {record.imageUrl ? (
-                      <img src={record.imageUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                        无图
-                      </div>
-                    )}
-                  </div>
+                <CardContent className="p-0">
+                  <div className="flex">
+                    {/* 缩略图 */}
+                    <div className="w-32 h-32 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex-shrink-0 relative overflow-hidden">
+                      {record.imageUrl ? (
+                        <img src={record.imageUrl} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+                          无图
+                        </div>
+                      )}
+                    </div>
 
-                  {/* 内容 */}
-                  <div className="flex-1 p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="font-semibold text-white text-lg mb-1">
-                          {record.topic || '未命名'}
-                        </h3>
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                          <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300">
-                            {record.templateName}
-                          </span>
-                          <span>•</span>
-                          <span>{formatDate(record.createdAt)}</span>
+                    {/* 内容 */}
+                    <div className="flex-1 p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="font-semibold text-foreground text-lg mb-2">
+                            {record.topic || '未命名'}
+                          </h3>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Badge variant="secondary">
+                              {record.templateName}
+                            </Badge>
+                            <span>•</span>
+                            <span>{formatDate(record.createdAt)}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {record.content && (
-                      <p className="text-sm text-gray-400 line-clamp-2 mb-4">
-                        {Object.values(record.content).slice(0, 2).join(' | ')}
-                      </p>
-                    )}
+                      {record.content && (
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                          {Object.values(record.content).slice(0, 2).join(' | ')}
+                        </p>
+                      )}
 
-                    {/* 操作按钮 */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleRestore(record)}
-                        className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm rounded-lg hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
-                      >
-                        恢复
-                      </button>
-                      <button
-                        onClick={() => handleDelete(record.id)}
-                        className="px-4 py-2 bg-white/5 text-gray-400 text-sm rounded-lg hover:bg-red-500/20 hover:text-red-400 transition-all"
-                      >
-                        删除
-                      </button>
+                      {/* 操作按钮 */}
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleRestore(record)}
+                          className="bg-primary hover:bg-primary/90"
+                        >
+                          <RotateCcw className="h-4 w-4 mr-1" />
+                          恢复
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDelete(record.id)}
+                          className="text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          删除
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         ) : (
           <div className="text-center py-20">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-4xl mx-auto mb-6">
-              📜
+            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+              <FileX className="h-10 w-10 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">暂无历史记录</h3>
-            <p className="text-gray-400 mb-8">开始创建你的第一个概念卡片吧</p>
-            <button
+            <h3 className="text-xl font-semibold text-foreground mb-2">暂无历史记录</h3>
+            <p className="text-muted-foreground mb-8">开始创建你的第一个概念卡片吧</p>
+            <Button
               onClick={() => router.push('/')}
-              className="px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
+              className="bg-primary hover:bg-primary/90"
             >
-              开始创建 ✨
-            </button>
+              <Plus className="h-4 w-4 mr-2" />
+              开始创建
+            </Button>
           </div>
         )}
-      </div>
+      </ScrollArea>
     </main>
   );
 }

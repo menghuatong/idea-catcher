@@ -2,6 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { 
+  ArrowLeft, 
+  RefreshCw, 
+  Pencil, 
+  Image as ImageIcon, 
+  Download,
+  Save,
+  Loader2,
+  Check,
+  Edit3
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppStore } from '@/store/useAppStore';
 import { CARD_SPECS, GeneratedContent, ImageStyle } from '@/types';
 
@@ -133,34 +152,46 @@ export default function ResultPage() {
   const currentSpec = CARD_SPECS.find(s => s.id === cardSpec) || CARD_SPECS[0];
 
   return (
-    <main className="min-h-screen bg-[#0F0F23] relative overflow-hidden">
+    <main className="min-h-screen bg-background relative overflow-hidden">
       {/* 背景 */}
       <div className="fixed inset-0 grid-bg" />
       <div className="fixed top-1/4 left-1/4 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px]" />
       <div className="fixed bottom-1/4 right-1/4 w-[300px] h-[300px] bg-purple-500/10 rounded-full blur-[80px]" />
 
       {/* 顶部导航 */}
-      <header className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-white/5">
+      <header className="relative z-50 flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-4">
-          <button onClick={() => router.push('/template')} className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:bg-white/10 transition-all">
-            ←
-          </button>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => router.push('/template')}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          
+          {/* 步骤指示器 */}
           <div className="flex items-center gap-2">
             {['数据获取', '选择模板', '生成结果'].map((step, i) => (
               <div key={step} className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  i === 2 ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white' 
-                  : 'bg-white/10 text-white'
+                  i === 2 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-muted text-foreground'
                 }`}>
                   {i + 1}
                 </div>
-                <span className={`text-sm ${i === 2 ? 'text-white' : 'text-gray-500'}`}>
+                <span className={`text-sm hidden sm:inline ${i === 2 ? 'text-foreground' : 'text-muted-foreground'}`}>
                   {step}
                 </span>
-                {i < 2 && <div className="w-8 h-px bg-white/10" />}
+                {i < 2 && <div className="w-8 h-px bg-border hidden sm:block" />}
               </div>
             ))}
           </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Progress value={100} className="w-24 hidden sm:flex" />
+          <Badge variant="secondary">完成</Badge>
         </div>
       </header>
 
@@ -168,14 +199,14 @@ export default function ResultPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* 卡片预览 */}
           <div>
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-sm">
-                🎴
-              </span>
-              卡片预览
-            </h2>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <span className="text-sm">🎴</span>
+              </div>
+              <h2 className="text-lg font-semibold text-foreground">卡片预览</h2>
+            </div>
             
-            <div className="bg-[#1A1A2E] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+            <Card className="overflow-hidden shadow-xl">
               {/* 配图 */}
               <div className="relative aspect-[3/4] bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
                 {imageUrl ? (
@@ -183,19 +214,19 @@ export default function ResultPage() {
                 ) : isGeneratingImage ? (
                   <div className="w-full h-full flex items-center justify-center">
                     <div className="text-center">
-                      <div className="text-4xl mb-2 animate-pulse">🎨</div>
-                      <span className="text-gray-400">生成配图中...</span>
+                      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-primary" />
+                      <span className="text-muted-foreground">生成配图中...</span>
                     </div>
                   </div>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-gray-500">点击生成配图</span>
+                    <ImageIcon className="h-12 w-12 text-muted-foreground/50" />
                   </div>
                 )}
                 {isGeneratingImage && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                     <div className="text-center">
-                      <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                      <Loader2 className="h-12 w-12 animate-spin mx-auto mb-3 text-primary" />
                       <span className="text-white text-sm">AI正在创作...</span>
                     </div>
                   </div>
@@ -203,132 +234,143 @@ export default function ResultPage() {
               </div>
 
               {/* 内容 */}
-              <div className="p-6">
+              <CardContent className="p-6">
                 {isGenerating ? (
                   <div className="text-center py-8">
-                    <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                    <span className="text-gray-400">AI正在生成...</span>
+                    <Loader2 className="h-12 w-12 animate-spin mx-auto mb-3 text-primary" />
+                    <span className="text-muted-foreground">AI正在生成...</span>
                   </div>
                 ) : generatedContent && selectedTemplate ? (
-                  <div className="space-y-4">
-                    {selectedTemplate.structure.map((field) => (
-                      <div key={field.key} className="group">
-                        {editingField === field.key ? (
-                          <div className="space-y-2">
-                            <textarea
-                              value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
-                              className="w-full p-3 bg-[#252542] border border-indigo-500/50 rounded-lg text-white text-sm outline-none"
-                              rows={2}
-                            />
-                            <div className="flex gap-2">
-                              <button onClick={handleSaveEdit} className="px-3 py-1 bg-indigo-500 text-white text-xs rounded">保存</button>
-                              <button onClick={() => setEditingField(null)} className="px-3 py-1 bg-white/10 text-gray-400 text-xs rounded">取消</button>
+                  <ScrollArea className="max-h-[400px]">
+                    <div className="space-y-4 pr-4">
+                      {selectedTemplate.structure.map((field) => (
+                        <div key={field.key} className="group">
+                          {editingField === field.key ? (
+                            <div className="space-y-2">
+                              <Textarea
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                className="min-h-[80px]"
+                              />
+                              <div className="flex gap-2">
+                                <Button size="sm" onClick={handleSaveEdit}>
+                                  <Check className="h-4 w-4 mr-1" />
+                                  保存
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={() => setEditingField(null)}>
+                                  取消
+                                </Button>
+                              </div>
                             </div>
+                          ) : (
+                            <div 
+                              onClick={() => handleStartEdit(field.key, generatedContent[field.key] || '')}
+                              className="cursor-pointer hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors"
+                            >
+                              <div className="text-xs text-primary mb-1 flex items-center gap-1">
+                                {field.label}
+                                <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                              <div className="text-foreground">{generatedContent[field.key] || '-'}</div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {sources.length > 0 && (
+                        <>
+                          <Separator />
+                          <div className="text-xs text-muted-foreground">
+                            数据来源：{sources.join('、')}
                           </div>
-                        ) : (
-                          <div 
-                            onClick={() => handleStartEdit(field.key, generatedContent[field.key] || '')}
-                            className="cursor-pointer hover:bg-white/5 rounded-lg p-2 -m-2 transition-colors"
-                          >
-                            <div className="text-xs text-indigo-400 mb-1">{field.label}</div>
-                            <div className="text-white">{generatedContent[field.key] || '-'}</div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    {sources.length > 0 && (
-                      <div className="pt-4 border-t border-white/10">
-                        <div className="text-xs text-gray-500">数据来源：{sources.join('、')}</div>
-                      </div>
-                    )}
-                  </div>
+                        </>
+                      )}
+                    </div>
+                  </ScrollArea>
                 ) : null}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* 控制面板 */}
           <div className="space-y-6">
             {/* 规格选择 */}
-            <div className="bg-[#1A1A2E] rounded-2xl p-6 border border-white/10">
-              <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
-                📐 卡片规格
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                {CARD_SPECS.map((spec) => (
-                  <button
-                    key={spec.id}
-                    onClick={() => setCardSpec(spec.id)}
-                    className={`p-4 rounded-xl text-left transition-all border ${
-                      cardSpec === spec.id
-                        ? 'border-indigo-500 bg-indigo-500/10'
-                        : 'border-white/10 hover:border-white/30'
-                    }`}
-                  >
-                    <div className="font-medium text-white">{spec.name}</div>
-                    <div className="text-xs text-gray-400 mt-1">{spec.platform}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">📐 卡片规格</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs value={cardSpec} onValueChange={(v) => setCardSpec(v as any)}>
+                  <TabsList className="grid grid-cols-4 w-full">
+                    {CARD_SPECS.map((spec) => (
+                      <TabsTrigger key={spec.id} value={spec.id} className="text-xs">
+                        {spec.name}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
+              </CardContent>
+            </Card>
 
             {/* 配图风格 */}
-            <div className="bg-[#1A1A2E] rounded-2xl p-6 border border-white/10">
-              <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
-                🎨 配图风格
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                {IMAGE_STYLES.map((style) => (
-                  <button
-                    key={style.id}
-                    onClick={() => { setImageStyle(style.id); handleRegenerateImage(); }}
-                    className={`p-4 rounded-xl text-left transition-all border ${
-                      imageStyle === style.id
-                        ? 'border-indigo-500 bg-indigo-500/10'
-                        : 'border-white/10 hover:border-white/30'
-                    }`}
-                  >
-                    <div className="text-2xl mb-1">{style.icon}</div>
-                    <div className="font-medium text-white">{style.name}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">🎨 配图风格</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  {IMAGE_STYLES.map((style) => (
+                    <Button
+                      key={style.id}
+                      variant={imageStyle === style.id ? 'default' : 'outline'}
+                      className="h-auto py-4 flex-col"
+                      onClick={() => { setImageStyle(style.id); handleRegenerateImage(); }}
+                    >
+                      <span className="text-2xl mb-1">{style.icon}</span>
+                      <span className="text-sm">{style.name}</span>
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
             {/* 操作按钮 */}
             <div className="space-y-3">
-              <button
+              <Button 
+                variant="outline" 
+                className="w-full"
                 onClick={generateContent}
                 disabled={isGenerating}
-                className="w-full py-4 bg-white/5 border border-white/10 text-white rounded-xl font-medium hover:bg-white/10 disabled:opacity-30 transition-all"
               >
-                {isGenerating ? '生成中...' : '🔄 重新生成内容'}
-              </button>
-              <button
+                <RefreshCw className={`h-4 w-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                {isGenerating ? '生成中...' : '重新生成内容'}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
                 onClick={handleRegenerateImage}
                 disabled={isGeneratingImage}
-                className="w-full py-4 bg-white/5 border border-white/10 text-white rounded-xl font-medium hover:bg-white/10 disabled:opacity-30 transition-all"
               >
-                {isGeneratingImage ? '生成中...' : '🎨 换张配图'}
-              </button>
+                <ImageIcon className="h-4 w-4 mr-2" />
+                {isGeneratingImage ? '生成中...' : '换张配图'}
+              </Button>
             </div>
 
             {/* 导出按钮 */}
             <div className="space-y-3">
-              <button
+              <Button 
+                className="w-full bg-primary hover:bg-primary/90"
                 onClick={() => handleExport('png')}
-                className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/30 transition-all"
               >
-                ⬇️ 下载 PNG
-              </button>
+                <Download className="h-4 w-4 mr-2" />
+                下载 PNG
+              </Button>
               <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => handleExport('jpg')} className="py-3 bg-white/5 border border-white/10 text-gray-300 rounded-xl hover:bg-white/10 transition-all">
+                <Button variant="outline" onClick={() => handleExport('jpg')}>
                   JPG
-                </button>
-                <button onClick={() => handleExport('pdf')} className="py-3 bg-white/5 border border-white/10 text-gray-300 rounded-xl hover:bg-white/10 transition-all">
+                </Button>
+                <Button variant="outline" onClick={() => handleExport('pdf')}>
                   PDF
-                </button>
+                </Button>
               </div>
             </div>
           </div>
